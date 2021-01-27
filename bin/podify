@@ -1,0 +1,21 @@
+#!/bin/sh -e
+# chroot converter for docker images
+# usage: podify <root> [name]
+
+root="${1:?chroot root directory not specified!}"
+root=${root%/}
+img_name="${2:-${root##*/}}"
+
+[ -f Dockerfile ] && {
+  echo Dockerfile exists. Please remove it.
+  exit 1;
+}
+
+cd "$root"
+cat > Dockerfile <<EOS
+FROM scratch
+ADD . /
+CMD ["/bin/sh"]
+EOS
+
+docker build -t ${img_name} .
