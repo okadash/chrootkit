@@ -28,7 +28,7 @@ mkdir: created directory 'some_chrootdir//usr/bin'
 
 If you already have any contents inside `some_chrootdir`, they may be replaced with new libraries or executables (destructive action). Be sure to use new environment.
 
-You can compose the chroot into docker images, using `podify` command.
+You can compose the chroot into a docker image, using `podify` command.
 
 ```
 $ podify some_chrootdir mybc
@@ -42,6 +42,18 @@ Step 3/3 : CMD ["/bin/sh"]
  ---> 1b5ad4d24c88
 Successfully built 1b5ad4d24c88
 Successfully tagged mybc:latest
+```
+
+and run the container:
+
+```
+$ docker run -it mybc -u 2021 /usr/bin/bc
+bc 1.xx.y
+Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type `warranty'. 
+                                                                                                                                                                                               22^16-1
+3011361496339065143295
 ```
 
 # Requirement
