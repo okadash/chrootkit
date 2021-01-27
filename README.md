@@ -17,9 +17,9 @@ podify some_chrootdir mybc
 # Requirement
 
 * a shell with posix compliant behaivior (busybox, bash, dash, etc.)
-* POSIX compliant readlinkf
 * GNU AWK
 * docker (if you need to pack them inside a docker image)
+* POSIX compliant readlinkf (recommended)
 
 # Usage
 
