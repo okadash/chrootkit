@@ -23,9 +23,9 @@ podify some_chrootdir mybc
 
 # Usage
 
-### addlib [</path/to/executable>, ...] <destination>
+addlib [</path/to/executable>, ...] \<destination\>
 
-### podify <root> [name]
+podify \<root\> [name]
 
 # Author
 
