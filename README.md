@@ -1,6 +1,6 @@
 # about
 
-chrootkit is a simple chroot builder and buldler. You can easly create your chroot environment for the specified command set.
+chrootkit is a simple chroot builder and bundler. You can easly create your chroot environment for the specified command set.
 
 ```
 addlib bc some_chrootdir
