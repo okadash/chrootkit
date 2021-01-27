@@ -60,7 +60,7 @@ $ echo 2^16-1 | docker run -i -u 1500 bc /usr/bin/bc
 
 # Usage
 
-addlib [<command>, ...] \<destination\>
+addlib \<command\ ...> \<destination\>
 
 podify \<root\> [name]
 
