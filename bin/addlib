@@ -1,6 +1,6 @@
 #!/bin/sh 
 # chroot builder for /bin/sh
-# usage: addlib [</path/to/executable>, ...] <destination>
+# usage: addlib [<executable>, ...] <destination>
 #  (requirement) readlinkf, gnu awk
 command -v readlinkf || alias readlinkf="readlink -f"
 throw(){ echo $* >&2; exit 1;}
