@@ -2,6 +2,10 @@
 
 chrootkit is a simple chroot builder and bundler. You can easly create your chroot environment for the specified command set.
 
+The command has two aliases: addlib and podify.
+
+addlib is a simple library bundler for commands. If you specified command as arguments, addlib copies these command binary in PATH and the libraries which these commands are dependent on. The last argument is parsed as a destination chroot directory.
+
 ```
 $ addlib bc some_chrootdir
 mkdir: created directory 'some_chrootdir'
@@ -60,7 +64,9 @@ $ echo 2^16-1 | docker run -i -u 1500 bc /usr/bin/bc
 
 # Usage
 
-addlib [<command>, ...] \<destination\>
+chrootkit [--add-libs|--bundle=docker]
+
+addlib \<executable\,...\> \<destination\>
 
 podify \<root\> [name]
 

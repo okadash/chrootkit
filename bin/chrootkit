@@ -1,0 +1,122 @@
+#!/bin/sh 
+# function: chrootkit - a simple chroot builder and bundler
+# usage: chrootkit [--add-libs|--bundle=docker]
+
+chrootkit(){
+  case ${1:?chrootkit: argument not specified!} in
+    --add-libs) shift; addlib $@;;
+    --bundle=*) IFS=\=; set $@; shift; podify_mode=docker podify $@;;
+    help|--help|*) show_usage ;;
+  esac
+}
+
+# sanitized
+# simple sanitization for semicolon
+sanitized(){ [ "$1" != "${1%%*;}" ]; }
+
+# throw
+# throwing exception and exit with error code
+throw(){ echo "$*", abort! >&2; exit 1; }
+
+# show_usage
+# inline usage format parser for the shellscript itself
+show_usage(){
+  padding=
+  is_first_comment=0 ##[param] 0: not read at now, 1: read at now, 2: read in past
+  is_shebang(){ [ "$1" != "${1###!/*}" ] && is_first_comment=1; }
+  is_blank(){ [ $# -ne 0 ] && set $@; [ $# -le 1 ]; }
+  is_comment(){ [ "$1" != "${1%%#*}" ]; }
+  is_usage(){ [ "$1" != "${1%%# usage:}" ]; }
+  cat < $0 | while read line; do 
+    if ! sanitized "$line" && ! is_shebang "$line" && is_comment "$line"; then 
+      while [ "$line" != "${line#\#}" ]; do line="${line#\#}"; done
+      while [ "$line" != "${line#\ }" ]; do line="${line#\ }"; done
+      if [ "$is_first_comment" = 1 ]; then 
+        is_first_comment=2
+        line="${line#function:}"
+        line="${line#method:}"
+        echo "${line# }"
+      elif [ "$line" != "${line#usage:}" ]; then 
+        echo "${padding}${line#${removal}}"
+        removal=usage:
+        padding="      "
+      fi
+    fi
+  done 
+}
+
+# function: addlib
+# chroot builder for /bin/sh
+# usage: addlib <executable, ...> <destination>
+#  (recommended dependency) readlinkf
+
+addlib(){
+
+command -v readlinkf || readlinkf(){ readlink -f ${1:?readlinkf: noarg}; }
+
+: ${1:?executable not specified!}
+: ${2:?chroot destination not specified!}
+
+sanitized "$#" && throw invalid semicolon detected
+root="$(eval echo \$$#)"
+: ${root:? root not set!}
+
+filter_library_path(){
+  sed -r -e "s/^(.*=>)?[[:blank:]]*//g" -e s/\ \.\+//g | grep /
+}
+
+while [ $# -gt 1 ] ; do
+
+  fullpath="$(command -v $1)"
+  : ${fullpath:?fullpath not set!}
+  file_fullpath="$(readlinkf $fullpath)"
+  : ${file_fullpath:?file_fullpath not set!}
+
+  for i in \
+    $(ldd $fullpath | filter_library_path) \
+    $(ldd $file_fullpath | filter_library_path) 
+  do 
+    tdir="$root/${i%/*}"; 
+    [ ! -d "$tdir" ] && mkdir -vp "$tdir"; 
+    cp -v "$i" "$root"/"$i"; 
+  done
+
+  [ ! -d "$root/${fullpath%/*}" ] && mkdir -vp "$root/${fullpath%/*}"
+  [ ! -d "$root/${file_fullpath%/*}" ] && mkdir -vp "$root/${file_fullpath%/*}"
+  cp -v "$fullpath" "$root/${fullpath%/*}"
+  cp -v "$file_fullpath" "$root/${file_fullpath%/*}"
+  shift;
+done
+
+}
+
+
+# function: podify
+# chroot converter for docker images
+# usage: podify <root> [name]
+
+podify(){
+
+root="${1:?chroot root directory not specified!}"
+root=${root%/}
+img_name="${2:-${root##*/}}"
+
+[ -f Dockerfile ] && {
+  echo Dockerfile exists. Please remove it.
+  exit 1;
+}
+
+cd "$root"
+cat > Dockerfile <<EOS
+FROM scratch
+ADD . /
+CMD ["/bin/sh"]
+EOS
+
+docker build -t ${img_name} .
+}
+
+
+case ${0##*/} in
+addlib) addlib $@;; podify) podify $@;; *) chrootkit $@;;
+esac
