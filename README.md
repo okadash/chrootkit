@@ -4,7 +4,7 @@
 
 The command `chrootkit` has two aliases: `addlib` and `podify`.
 
-`addlib` is a simple library bundler for commands. If you specified command as arguments, `addlib` copies these command binary in PATH and the libraries which these commands are dependent on. The last argument is parsed as a destination chroot directory.
+`addlib` is a simple library bundler for commands. If you supplied commands as arguments, `addlib` copies these command binaries from your PATH and the libraries which these commands are dependent on. The last argument is parsed as a destination chroot directory. commands can be specified with command name or full path to the executable.
 
 ```
 $ addlib bc some_chrootdir
@@ -59,7 +59,7 @@ $ echo 2^16-1 | docker run -i -u 1500 bc /usr/bin/bc
 
 * a shell with posix compliant behaivior (busybox, bash, dash, etc.)
 * docker (if you need to pack them inside a docker image)
-* POSIX compliant readlinkf (recommended)
+* POSIX compliant readlinkf as a command (recommended)
 
 # Usage
 
